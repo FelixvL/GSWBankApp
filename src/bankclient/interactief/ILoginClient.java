@@ -1,5 +1,10 @@
 package bankclient.interactief;
 
-public interface ILoginClient {
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface ILoginClient extends Remote{
+	void proberen() throws RemoteException;
+	void nogmaals() throws RemoteException;
 
 }

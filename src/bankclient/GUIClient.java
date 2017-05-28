@@ -1,11 +1,12 @@
-package bankclient.gui;
+package bankclient;
  
+import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 
-
+import bankclient.gui.ClientGUIController;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,35 +22,37 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
  
 public class GUIClient extends Application {
-    ClientGUIController clientGUIController;
-    TextField userTextField;
-    PasswordField pwBox;
-    void gogo(){
-    	System.out.println("Hier in de GUIclietn");
-    	
+    private ClientGUIController clientGUIController;
+    private TextField gebruikersNaamTextField;
+    private PasswordField wachtwoordTextField;
+    
+    public void testMethodeInClient(){
+    	System.out.println("Printout in de GUIclient in methode testMethodeClient");	
     }
+    
     void inlogButtonAction(){
     	boolean verbonden = false;
     	try{
-    	verbonden = clientGUIController.verbindMetBank(userTextField.getText(), pwBox.getText());
-    	}catch(Exception e){
-    		
+    		verbonden = clientGUIController.verbindMetBank(gebruikersNaamTextField.getText(), wachtwoordTextField.getText());
+    	}catch(UnknownHostException | NotBoundException e){
+    		System.out.println("Exception UnknownHost of NotBoud in poging inloggen bank vanuit inlogButtonAction");
+    		e.printStackTrace();
     	}
     	if(verbonden){
     		System.out.println("Yes verbonden vanuit GUIClient");
     	}else{
     		System.out.println("Nope Niet verbonden van GUIClient");
     	}
-    	System.out.println("Aan het einde in GUI Client");
-    	
     }
     public static void main(String[] args) {
         launch(args);
     }
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Hello World!");
         clientGUIController = new ClientGUIController(this);
+
+        primaryStage.setTitle("BankClientApplicatie");
+        
         Button btn = new Button();
         btn.setText("Inloggen");
         btn.setOnAction(new EventHandler<ActionEvent>() { 
@@ -58,32 +61,34 @@ public class GUIClient extends Application {
             	inlogButtonAction();
             }
         });
+        
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
+        
         Text scenetitle = new Text("Welcome");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
-
         Label userName = new Label("User Name:");
         grid.add(userName, 0, 1);
-
-        userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
-
+        gebruikersNaamTextField = new TextField();
+        grid.add(gebruikersNaamTextField, 1, 1);
         Label pw = new Label("Password:");
         grid.add(pw, 0, 2);
-
-        pwBox = new PasswordField();
-        grid.add(pwBox, 1, 2);
+        wachtwoordTextField = new PasswordField();
+        grid.add(wachtwoordTextField, 1, 2);
         grid.add(btn, 0, 3);
-        Scene scene = new Scene(grid, 1000, 750);
+        
+        Scene scene = new Scene(grid, 700, 550);
         primaryStage.setScene(scene);
         StackPane root = new StackPane();
         root.getChildren().add(grid);
-        primaryStage.setScene(new Scene(root, 1000, 750));
+        primaryStage.setScene(new Scene(root, 700, 550));
         primaryStage.show();
+    }
+    public void setTeksten(){
+    	gebruikersNaamTextField.setText("GO");
     }
 }

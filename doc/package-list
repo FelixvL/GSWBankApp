@@ -1,0 +1,10 @@
+bank
+bank.interactief.centralebank
+bank.interactief.client
+bank.model
+bankclient
+bankclient.gui
+bankclient.interactief
+centralebank
+centralebank.interactief
+centralebank.intern

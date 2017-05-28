@@ -1,32 +1,55 @@
 package bank.model;
 
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
 import java.util.Scanner;
 
 import bank.interactief.client.ILoginBank;
 import bank.interactief.client.LoginCentrale;
-import centralebank.interactief.IIntermediairCentraleBank;
+import bankclient.interactief.ILoginClient;
 
 public class Bank {
-	private String IBAN;
-	private String naam;
-	private String landcode;
+//	private String IBAN;
+//	private String naam;
+//	private String landcode;
 	
-	private IIntermediairCentraleBank iicb;
-	private List<Sessie> sessies;
+//	private IIntermediairCentraleBank iicb;
+//	private List<Sessie> sessies;
 	
-	ILoginBank iLoginBank;
+	private ILoginBank iLoginBank;
+	private ILoginClient iLoginClient;
+	public void actie() throws Exception{
+		System.out.println("actie in bank");
+	     Registry registry = null;
+	        try {
+	        	registry = LocateRegistry.getRegistry(InetAddress.getLocalHost().getHostAddress(),1098);
+	        } catch (RemoteException ex) { 
+	        	System.out.println("Locate Registry mislukt");
+	        	ex.printStackTrace();
+	        }
+	        try {
+	        	ILoginClient loginClient = (ILoginClient)registry.lookup("loginclient");
+	        	iLoginClient = loginClient;
+	        } catch (RemoteException exc) {
+	        	System.out.println("Verbind met Bank mislukt in ClientGUIController: " + exc.getMessage());
+	        }
+	        try{
+	        	iLoginClient.proberen();
+	        }catch(RemoteException e){
+	        	System.out.println("aanroep methode bij bank mislukt in ClientGUIController.");
+	        }
+		
+	}
 	
 	public Bank(){
 		try {
-			iLoginBank = new LoginCentrale();
-		} catch (Exception e) {
+			iLoginBank = new LoginCentrale(this);
+		} catch (RemoteException e) {
+			System.out.println("Instantiatie van LoginCentrale mislukt vanuit Bank");
 			e.printStackTrace();
 		}
-
 	}
 	
 	void loginCentraleRegistreren() throws InterruptedException{
@@ -34,19 +57,22 @@ public class Bank {
 		try {
 		      registry = LocateRegistry.createRegistry(1099);
 		} catch (RemoteException ex) {
-			System.out.println("Registry-creation is not working: " + ex.getMessage());
+			System.out.println("Registry-creation is niet gelukt vanuit bank: " + ex.getMessage());
 		} 
 		try {
-//			IEffectenBeurs effBeurs = new EffectenBeurs();
-			registry.rebind("jojo", iLoginBank);
+			registry.rebind("loginbank", iLoginBank);
 		} catch (RemoteException exc) { 
-			System.out.println("effBeurs is not bound.");
+			System.out.println("LoginBank is not bound.");
+			exc.printStackTrace();
 		}
 	}
 	public void openen(){
 		try{
-		loginCentraleRegistreren();
-		}catch(Exception e){}
+			loginCentraleRegistreren();
+		}catch(InterruptedException e){
+			System.out.println("Aanroep van het registreren van de bank mislukt");
+			e.printStackTrace();
+		}
 		Scanner scanner = new Scanner(System.in);
 		boolean goOn = true;
 		while(goOn){
@@ -56,7 +82,15 @@ public class Bank {
 			if(str.equals("exit")){
 				goOn = false;
 			}
+			if(str.equals("gomfr")){
+				try{
+				iLoginClient.nogmaals();
+				}catch(Exception e){
+					
+				}
+			}
 		}
 		System.out.println("De bank is gesloten. ");
+		scanner.close();
 	}
 }
