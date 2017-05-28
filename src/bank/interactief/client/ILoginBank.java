@@ -1,5 +1,5 @@
 package bank.interactief.client;
 
-public class ILoginBank {
+public interface ILoginBank {
 
 }
