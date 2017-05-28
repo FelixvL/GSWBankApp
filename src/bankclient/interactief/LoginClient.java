@@ -1,5 +1,5 @@
 package bankclient.interactief;
 
-public class LoginClient {
+public class LoginClient implements ILoginClient {
 
 }
